@@ -26,5 +26,26 @@ tests/    router + manifest policy gates
 docs/     DESIGN.md (Manus V1 design), VULNERABILITY_ANALYSIS.md (what this closes)
 ```
 
+## Build / test (plain Node, zero deps)
+
+```bash
+npm run build          # generate-cid + assemble dist/chrome + check-manifest
+npm test               # node --test (router + manifest)
+npm run check-manifest
+npm run package        # zip + SHA256SUMS + SBOM
+```
+
+Load unpacked: Chrome → Extensions → Developer mode → `dist/chrome`.
+
+Local CPCP via messaging:
+
+```js
+chrome.runtime.sendMessage({
+  cpcpPath: '/_cpcp/rpc',
+  method: 'switchyard.route',
+  params: { strategy: 'passthrough', provider: 'openai', dryRun: true }
+});
+```
+
 Upstream engine: **NVIDIA NeMo Switchyard** (pre-alpha) &mdash; github.com/NVIDIA-NeMo/Switchyard.
 Design: `docs/DESIGN.md`. Private; LicenseRef-DataYoursSoftwareMine-1.0.
