@@ -1,0 +1,1 @@
+// SwitchYard.offline chrome/service-worker.js - MV3 module worker: local CPCP surface (/_cpcp/rpc, /_cpcp/cid.json) over chrome.runtime + externally_connectable; routes via shared/router.js; direct egress via shared/egress.js. Implement per docs/DESIGN.md.
