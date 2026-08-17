@@ -2,7 +2,7 @@
   "name": "app-switchyard-offline",
   "version": "0.1.0",
   "private": true,
-  "description": "SwitchYard.offline V1 — local content-blind CPCP LLM router (Chrome MV3)",
+  "description": "SwitchYard.offline V1 — local content-blind CPCP LLM router (Chrome MV3 + loopback listener)",
   "type": "module",
   "scripts": {
     "generate-cid": "node build/generate-cid.mjs",
@@ -10,6 +10,7 @@
     "check": "node build/check-manifest.mjs",
     "check-manifest": "node build/check-manifest.mjs",
     "test": "node --test tests/*.test.mjs",
+    "listen": "node local-listener/server.mjs",
     "sbom": "node build/generate-sbom.mjs",
     "package": "node build/package.mjs",
     "clean": "node build/clean.mjs"

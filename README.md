@@ -19,21 +19,24 @@ with no hosted endpoint decrypting your content.
 
 ## Layout (app-browser-plugin model)
 ```
-shared/   browser-agnostic core: router, routes, egress, contract, errors, cid.template.json
-chrome/   MV3 overlay: manifest.json, service-worker.js (local CPCP surface), credential-store.js, popup
-build/    generate-cid, build, check-manifest, generate-sbom, package, clean (-> dist/chrome)
-tests/    router + manifest policy gates
-docs/     DESIGN.md (Manus V1 design), VULNERABILITY_ANALYSIS.md (what this closes)
+shared/          browser-agnostic core: router, routes, egress, contract, errors, cid.template.json
+chrome/          MV3 overlay: manifest.json, service-worker.js, credential-store.js, popup
+local-listener/  loopback HTTP (127.0.0.1:8789) for any-language OpenAI base_url clients
+build/           generate-cid, build, check-manifest, generate-sbom, package, clean
+tests/           router + manifest + listener
+docs/            DESIGN.md, VULNERABILITY_ANALYSIS.md
 ```
 
 ## Build / test (plain Node, zero deps)
 
 ```bash
 npm run build          # generate-cid + assemble dist/chrome + check-manifest
-npm test               # node --test (router + manifest)
+npm test               # node --test (router + manifest + listener)
 npm run check-manifest
 npm run package        # zip + SHA256SUMS + SBOM
 ```
+
+### Chrome MV3 extension
 
 Load unpacked: Chrome → Extensions → Developer mode → `dist/chrome`.
 
@@ -46,6 +49,33 @@ chrome.runtime.sendMessage({
   params: { strategy: 'passthrough', provider: 'openai', dryRun: true }
 });
 ```
+
+### Run the local listener
+
+For any language client that wants an OpenAI-compatible `base_url` (as site docs describe):
+
+```bash
+# optional: export SWITCHYARD_LOCAL_TOKEN=…  SWITCHYARD_OPENAI_KEY=…
+# or put keys in ~/.switchyard-offline/keys.json (chmod 600)
+npm run listen          # http://127.0.0.1:8789  (SWITCHYARD_LOCAL_PORT to override)
+```
+
+- **Bind:** `127.0.0.1` only (never `0.0.0.0`)
+- **Auth:** every request needs header `X-SwitchYard-Token` (env `SWITCHYARD_LOCAL_TOKEN` or auto file `~/.switchyard-offline/token`)
+- **Abuse guard:** requests with `Origin` or `Referer` are **rejected** (no browser CORS)
+- **Endpoints:**
+  - `GET /_cpcp/cid.json`
+  - `POST /_cpcp/rpc`
+  - `POST /v1/chat/completions` (OpenAI shape → allowlisted provider via shared/router+egress)
+  - `POST /v1/messages` (Anthropic shape)
+- **Routing metadata** (content-blind headers): `X-SwitchYard-Strategy`, `X-SwitchYard-Provider`, `X-SwitchYard-Stage`
+
+```bash
+TOKEN=$(cat ~/.switchyard-offline/token)
+curl -sS -H "X-SwitchYard-Token: $TOKEN" http://127.0.0.1:8789/_cpcp/cid.json
+```
+
+The MV3 extension path is unchanged for in-browser JS (`chrome.runtime` messaging).
 
 Upstream engine: **NVIDIA NeMo Switchyard** (pre-alpha) &mdash; github.com/NVIDIA-NeMo/Switchyard.
 Design: `docs/DESIGN.md`. Private; LicenseRef-DataYoursSoftwareMine-1.0.
