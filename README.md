@@ -1,4 +1,4 @@
-# app-switchyard-offline (private) &mdash; **SwitchYard.offline**
+# app-switchyard-offline &mdash; **SwitchYard.offline**
 
 **A local, content-blind LLM router.** SwitchYard.offline is a Chrome MV3 extension that is
 **nothing but a CPCP wrapper around NVIDIA SwitchYard's three no-inspection routing features**
@@ -78,4 +78,4 @@ curl -sS -H "X-SwitchYard-Token: $TOKEN" http://127.0.0.1:8789/_cpcp/cid.json
 The MV3 extension path is unchanged for in-browser JS (`chrome.runtime` messaging).
 
 Upstream engine: **NVIDIA NeMo Switchyard** (pre-alpha) &mdash; github.com/NVIDIA-NeMo/Switchyard.
-Design: `docs/DESIGN.md`. Private; LicenseRef-DataYoursSoftwareMine-1.0.
+Design: `docs/DESIGN.md`. Private; Apache-2.0.
